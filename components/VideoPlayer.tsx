@@ -149,20 +149,20 @@ export default function VideoPlayer() {
             <div
               style={{
                 position: "absolute",
-                left: 0,
-                right: 0,
-                bottom: 0,
-                padding: "18px 24px 24px",
+                left: "4%",
+                right: "4%",
+                bottom: 12,
+                padding: "14px 16px",
                 background:
-                  "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.75) 70%)",
+                  "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.75) 85%)",
+                borderRadius: 20,
+                boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
                 transform: controlsVisible
                   ? "translateY(0)"
-                  : "translateY(60px)",
+                  : "translateY(80px)",
                 opacity: controlsVisible ? 1 : 0,
                 transition: "transform 0.3s ease, opacity 0.3s ease",
                 pointerEvents: controlsVisible ? "auto" : "none",
-                borderBottomLeftRadius: "28px",
-                borderBottomRightRadius: "28px",
               }}
             >
               <MediaTimeRange />
