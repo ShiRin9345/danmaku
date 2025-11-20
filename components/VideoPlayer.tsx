@@ -3,6 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import Danmaku from "danmaku";
+import {
+  MediaController,
+  MediaControlBar,
+  MediaTimeRange,
+  MediaTimeDisplay,
+  MediaVolumeRange,
+  MediaPlayButton,
+  MediaMuteButton,
+  MediaPlaybackRateButton,
+  MediaFullscreenButton,
+} from "media-chrome/react";
 import danmakuSeed, { type SeedDanmaku, COLOR_POOL } from "@/lib/danmakuSeed";
 
 type DanmakuPayload = SeedDanmaku;
@@ -94,7 +105,8 @@ export default function VideoPlayer() {
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-semibold">弹幕视频演示</h1>
         <p className="text-base text-zinc-500">
-          使用 Danmaku 官方文档方式实现，包含 1000 条预置弹幕与实时弹幕示例。
+          使用 Media Chrome + Danmaku 实现，包含 10000
+          条预置弹幕与实时弹幕示例。
         </p>
       </div>
 
@@ -109,15 +121,36 @@ export default function VideoPlayer() {
             fontSize: "18px",
           }}
         >
-          <video
-            ref={videoRef}
-            className="absolute inset-0 h-full w-full object-cover"
-            controls
-            style={{ position: "absolute" }}
-            src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+          <MediaController
+            suppressHydrationWarning
+            style={{
+              width: "100%",
+              height: "100%",
+              position: "absolute",
+              top: 0,
+              left: 0,
+            }}
           >
-            您的浏览器不支持 HTML5 视频。
-          </video>
+            <video
+              ref={videoRef}
+              slot="media"
+              suppressHydrationWarning
+              className="h-full w-full object-cover"
+              preload="auto"
+              src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+            >
+              您的浏览器不支持 HTML5 视频。
+            </video>
+            <MediaControlBar>
+              <MediaPlayButton />
+              <MediaTimeRange />
+              <MediaTimeDisplay showDuration />
+              <MediaMuteButton />
+              <MediaVolumeRange />
+              <MediaPlaybackRateButton />
+              <MediaFullscreenButton />
+            </MediaControlBar>
+          </MediaController>
         </div>
 
         <div className="flex flex-col gap-3">

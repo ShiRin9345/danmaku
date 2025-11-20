@@ -28,7 +28,7 @@ const MODE_POOL: Array<"rtl" | "ltr" | "top" | "bottom"> = [
 ];
 
 const VIDEO_DURATION_SECONDS = 9 * 60 + 56; // 9 分 56 秒 ≈ 596 秒
-const TOTAL_COMMENTS = 1000;
+const TOTAL_COMMENTS = 10000; // 压力测试：10000 条弹幕
 
 function createDanmakuSeed(): SeedDanmaku[] {
   return Array.from({ length: TOTAL_COMMENTS }, (_, index) => {
@@ -55,7 +55,7 @@ function createDanmakuSeed(): SeedDanmaku[] {
       time: Math.min(time, VIDEO_DURATION_SECONDS - 1),
       mode: MODE_POOL[index % MODE_POOL.length],
       style: {
-        fontSize: `${14 + (index % 10)}px`,
+        fontSize: `${18 + (index % 12)}px`, // 18-30px，更大的字体便于压力测试观察
         color: COLOR_POOL[index % COLOR_POOL.length],
         fontWeight: index % 7 === 0 ? "bold" : undefined,
         textShadow: index % 9 === 0 ? "0 0 6px rgba(0,0,0,0.45)" : undefined,
