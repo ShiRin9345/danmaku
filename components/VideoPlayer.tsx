@@ -238,12 +238,12 @@ export default function VideoPlayer() {
                 <MediaTimeRange />
               </div>
               <MediaControlBar>
-                <MediaPlayButton />
+                <MediaPlayButton noTooltip />
                 <MediaTimeDisplay showDuration />
                 <div className="flex-1" />
-                <MediaMuteButton />
+                <MediaMuteButton noTooltip />
                 <MediaVolumeRange />
-                <MediaPlaybackRateButton />
+                <MediaPlaybackRateButton noTooltip />
                 <button
                   type="button"
                   onClick={toggleDanmaku}
@@ -264,7 +264,7 @@ export default function VideoPlayer() {
                     弹
                   </span>
                 </button>
-                <MediaFullscreenButton />
+                <MediaFullscreenButton noTooltip />
               </MediaControlBar>
             </div>
           </MediaController>

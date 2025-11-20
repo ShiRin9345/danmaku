@@ -150,8 +150,11 @@ media-time-range {
 }
 
 media-time-display {
+  --media-text-background: transparent;
+  --media-control-hover-background: transparent;
   font-size: 13px;
   color: #fff;
+  padding: 0;
 }
 
 media-time-range::part(track),
