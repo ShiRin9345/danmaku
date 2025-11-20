@@ -74,8 +74,9 @@ export function fetchDanmakuChunk(minute: number): Promise<SeedDanmaku[]> {
   }
 
   return new Promise((resolve) => {
-    const latency = 200 + Math.random() * 200;
+    const latency = 5000 + Math.random() * 200;
     setTimeout(() => {
+      console.log("loaded chunk", minute);
       resolve(createMinuteChunk(minute));
     }, latency);
   });

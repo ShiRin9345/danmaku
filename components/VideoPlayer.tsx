@@ -14,13 +14,13 @@ import {
   MediaPlaybackRateButton,
   MediaFullscreenButton,
 } from "media-chrome/react";
-import { MessageCircle } from "lucide-react";
 import {
   COLOR_POOL,
   VIDEO_DURATION_SECONDS,
   fetchDanmakuChunk,
   type SeedDanmaku,
 } from "@/lib/danmakuSeed";
+import { cn } from "@/lib/utils";
 
 type DanmakuPayload = SeedDanmaku;
 
@@ -203,13 +203,7 @@ export default function VideoPlayer() {
       <div className="w-full max-w-5xl space-y-4">
         <div
           ref={containerRef}
-          className="relative w-full overflow-hidden rounded-[28px] bg-black shadow-[0_24px_60px_rgba(15,23,42,0.45)]"
-          style={{
-            aspectRatio: "16 / 9",
-            minHeight: "360px",
-            lineHeight: "1.2",
-            fontSize: "18px",
-          }}
+          className="relative w-full overflow-hidden rounded-[28px] bg-black shadow-[0_24px_60px_rgba(15,23,42,0.45)] aspect-video min-h-[360px] leading-[1.2] text-[18px]"
           onMouseEnter={() => setControlsVisible(true)}
           onMouseMove={() => setControlsVisible(true)}
           onMouseLeave={() => setControlsVisible(false)}
@@ -217,13 +211,7 @@ export default function VideoPlayer() {
         >
           <MediaController
             suppressHydrationWarning
-            style={{
-              width: "100%",
-              height: "100%",
-              position: "absolute",
-              top: 0,
-              left: 0,
-            }}
+            className="w-full h-full absolute top-0 left-0"
           >
             <video
               ref={videoRef}
@@ -236,35 +224,23 @@ export default function VideoPlayer() {
               您的浏览器不支持 HTML5 视频。
             </video>
             <div
-              style={{
-                position: "absolute",
-                insetInline: "8%",
-                bottom: 16,
-                padding: "16px 20px 18px",
-                background:
-                  "linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.65) 100%)",
-                borderRadius: 24,
-                boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
-                transform: controlsVisible
-                  ? "translateY(0)"
-                  : "translateY(80px)",
-                opacity: controlsVisible ? 1 : 0,
-                transition: "transform 0.3s ease, opacity 0.3s ease",
-                pointerEvents: controlsVisible ? "auto" : "none",
-              }}
+              className={cn(
+                "absolute left-[8%] right-[8%] bottom-4 px-5 py-4 pb-[18px] rounded-3xl",
+                "bg-linear-to-b from-black/5 to-black/65",
+                "shadow-[0_20px_60px_rgba(0,0,0,0.3)]",
+                "transition-all duration-300 ease-in-out",
+                controlsVisible
+                  ? "translate-y-0 opacity-100 pointer-events-auto"
+                  : "translate-y-20 opacity-0 pointer-events-none"
+              )}
             >
-              <div
-                style={{
-                  paddingInline: "8px",
-                  paddingBottom: "10px",
-                }}
-              >
+              <div className="px-2 pb-[10px]">
                 <MediaTimeRange />
               </div>
               <MediaControlBar>
                 <MediaPlayButton />
                 <MediaTimeDisplay showDuration />
-                <div style={{ flex: 1 }} />
+                <div className="flex-1" />
                 <MediaMuteButton />
                 <MediaVolumeRange />
                 <MediaPlaybackRateButton />
@@ -272,27 +248,21 @@ export default function VideoPlayer() {
                   type="button"
                   onClick={toggleDanmaku}
                   aria-label={danmakuEnabled ? "关闭弹幕" : "开启弹幕"}
-                  style={{
-                    border: "none",
-                    borderRadius: "12px",
-                    padding: "6px",
-                    background: danmakuEnabled
-                      ? "rgba(0,0,0,0.55)"
-                      : "rgba(0,0,0,0.25)",
-                    color: "#fff",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: "34px",
-                    height: "34px",
-                    cursor: "pointer",
-                  }}
+                  className={cn(
+                    "border-none rounded-xl p-1.5 text-white",
+                    "flex items-center justify-center",
+                    "w-[34px] h-[34px] cursor-pointer",
+                    danmakuEnabled ? "bg-black/55" : "bg-black/25"
+                  )}
                 >
-                  <MessageCircle
-                    size={16}
-                    strokeWidth={2}
-                    style={{ opacity: danmakuEnabled ? 1 : 0.5 }}
-                  />
+                  <span
+                    className={cn(
+                      "text-xs font-bold select-none",
+                      danmakuEnabled ? "opacity-100" : "opacity-50"
+                    )}
+                  >
+                    弹
+                  </span>
                 </button>
                 <MediaFullscreenButton />
               </MediaControlBar>

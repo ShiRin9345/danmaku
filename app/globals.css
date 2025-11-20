@@ -178,6 +178,10 @@ media-fullscreen-button {
 }
 
 media-volume-range {
+  background: transparent;
+  box-shadow: none;
+  --media-control-background: transparent;
+  --media-control-hover-background: transparent;
   --media-range-track-height: 4px;
   --media-range-track-color: rgba(255, 255, 255, 0.3);
   --media-range-bar-color: #ffffff;
