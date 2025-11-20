@@ -14,6 +14,7 @@ import {
   MediaPlaybackRateButton,
   MediaFullscreenButton,
 } from "media-chrome/react";
+import { MessageCircle } from "lucide-react";
 import danmakuSeed, { type SeedDanmaku, COLOR_POOL } from "@/lib/danmakuSeed";
 
 type DanmakuPayload = SeedDanmaku;
@@ -26,6 +27,8 @@ export default function VideoPlayer() {
   const [inputValue, setInputValue] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
+  const [danmakuEnabled, setDanmakuEnabled] = useState(true);
+  const danmakuEnabledRef = useRef(true);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -56,6 +59,7 @@ export default function VideoPlayer() {
     socket.on("connect", () => setIsConnected(true));
     socket.on("disconnect", () => setIsConnected(false));
     socket.on("receiveDanmaku", (payload: DanmakuPayload) => {
+      if (!danmakuEnabledRef.current) return;
       danmakuRef.current?.emit({
         text: payload.text,
         mode: payload.mode,
@@ -90,9 +94,25 @@ export default function VideoPlayer() {
       },
     };
 
-    danmakuRef.current?.emit(payload);
+    if (danmakuEnabledRef.current) {
+      danmakuRef.current?.emit(payload);
+    }
     socketRef.current.emit("sendDanmaku", payload);
     setInputValue("");
+  };
+
+  const toggleDanmaku = () => {
+    setDanmakuEnabled((prev) => {
+      const next = !prev;
+      danmakuEnabledRef.current = next;
+      if (next) {
+        danmakuRef.current?.show();
+      } else {
+        danmakuRef.current?.clear();
+        danmakuRef.current?.hide();
+      }
+      return next;
+    });
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -179,6 +199,32 @@ export default function VideoPlayer() {
                 <MediaMuteButton />
                 <MediaVolumeRange />
                 <MediaPlaybackRateButton />
+                <button
+                  type="button"
+                  onClick={toggleDanmaku}
+                  aria-label={danmakuEnabled ? "关闭弹幕" : "开启弹幕"}
+                  style={{
+                    border: "none",
+                    borderRadius: "12px",
+                    padding: "6px",
+                    background: danmakuEnabled
+                      ? "rgba(0,0,0,0.55)"
+                      : "rgba(0,0,0,0.25)",
+                    color: "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "34px",
+                    height: "34px",
+                    cursor: "pointer",
+                  }}
+                >
+                  <MessageCircle
+                    size={16}
+                    strokeWidth={2}
+                    style={{ opacity: danmakuEnabled ? 1 : 0.5 }}
+                  />
+                </button>
                 <MediaFullscreenButton />
               </MediaControlBar>
             </div>
