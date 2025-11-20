@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import Danmaku from "danmaku";
 import {
@@ -15,7 +15,12 @@ import {
   MediaFullscreenButton,
 } from "media-chrome/react";
 import { MessageCircle } from "lucide-react";
-import danmakuSeed, { type SeedDanmaku, COLOR_POOL } from "@/lib/danmakuSeed";
+import {
+  COLOR_POOL,
+  VIDEO_DURATION_SECONDS,
+  fetchDanmakuChunk,
+  type SeedDanmaku,
+} from "@/lib/danmakuSeed";
 
 type DanmakuPayload = SeedDanmaku;
 
@@ -24,11 +29,15 @@ export default function VideoPlayer() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const danmakuRef = useRef<Danmaku | null>(null);
   const socketRef = useRef<Socket | null>(null);
+  const loadedMinutesRef = useRef<Set<number>>(new Set());
+  const pendingMinutesRef = useRef<Set<number>>(new Set());
+  const danmakuChunksRef = useRef<Map<number, SeedDanmaku[]>>(new Map());
+  const danmakuEnabledRef = useRef(true);
+
   const [inputValue, setInputValue] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [danmakuEnabled, setDanmakuEnabled] = useState(true);
-  const danmakuEnabledRef = useRef(true);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -45,7 +54,7 @@ export default function VideoPlayer() {
         container: containerRef.current,
         media: videoRef.current,
         engine: "dom",
-        comments: danmakuSeed,
+        comments: [],
       });
       danmakuRef.current.resize();
     };
@@ -79,6 +88,64 @@ export default function VideoPlayer() {
     };
   }, []);
 
+  const emitChunk = useCallback((chunk: SeedDanmaku[]) => {
+    chunk.forEach((comment) => {
+      danmakuRef.current?.emit({ ...comment });
+    });
+  }, []);
+
+  const ensureMinuteLoaded = useCallback(
+    async (minute: number) => {
+      const totalMinutes = Math.ceil(VIDEO_DURATION_SECONDS / 60);
+      if (minute < 0 || minute >= totalMinutes) return;
+      if (
+        loadedMinutesRef.current.has(minute) ||
+        pendingMinutesRef.current.has(minute)
+      )
+        return;
+      pendingMinutesRef.current.add(minute);
+      try {
+        const chunk = await fetchDanmakuChunk(minute);
+        if (!chunk.length) return;
+        loadedMinutesRef.current.add(minute);
+        danmakuChunksRef.current.set(minute, chunk);
+        if (danmakuEnabledRef.current) {
+          emitChunk(chunk);
+        }
+      } finally {
+        pendingMinutesRef.current.delete(minute);
+      }
+    },
+    [emitChunk]
+  );
+
+  useEffect(() => {
+    ensureMinuteLoaded(0);
+    ensureMinuteLoaded(1);
+  }, [ensureMinuteLoaded]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const requestChunk = () => {
+      const currentMinute = Math.floor(video.currentTime / 60);
+      ensureMinuteLoaded(currentMinute);
+      ensureMinuteLoaded(currentMinute + 1);
+    };
+
+    const handleSeeked = () => {
+      requestChunk();
+    };
+
+    video.addEventListener("timeupdate", requestChunk);
+    video.addEventListener("seeked", handleSeeked);
+    return () => {
+      video.removeEventListener("timeupdate", requestChunk);
+      video.removeEventListener("seeked", handleSeeked);
+    };
+  }, [ensureMinuteLoaded, emitChunk]);
+
   const sendDanmaku = () => {
     if (!inputValue.trim() || !socketRef.current || !videoRef.current) return;
 
@@ -107,6 +174,8 @@ export default function VideoPlayer() {
       danmakuEnabledRef.current = next;
       if (next) {
         danmakuRef.current?.show();
+        danmakuRef.current?.clear();
+        danmakuChunksRef.current.forEach((chunk) => emitChunk(chunk));
       } else {
         danmakuRef.current?.clear();
         danmakuRef.current?.hide();

@@ -1,6 +1,6 @@
 export type SeedDanmaku = {
   text: string;
-  time?: number;
+  time: number;
   mode?: "rtl" | "ltr" | "top" | "bottom";
   style?: Partial<CSSStyleDeclaration>;
 };
@@ -27,43 +27,56 @@ const MODE_POOL: Array<"rtl" | "ltr" | "top" | "bottom"> = [
   "bottom",
 ];
 
-const VIDEO_DURATION_SECONDS = 9 * 60 + 56; // 9 分 56 秒 ≈ 596 秒
-const TOTAL_COMMENTS = 10000; // 压力测试：10000 条弹幕
+export const VIDEO_DURATION_SECONDS = 9 * 60 + 56; // 9 分 56 秒 ≈ 596 秒
+export const TOTAL_MINUTES = Math.ceil(VIDEO_DURATION_SECONDS / 60);
+const COMMENTS_PER_MINUTE = 120;
 
-function createDanmakuSeed(): SeedDanmaku[] {
-  return Array.from({ length: TOTAL_COMMENTS }, (_, index) => {
-    const ratio = index / TOTAL_COMMENTS;
-    const baseTime = ratio * (VIDEO_DURATION_SECONDS - 5);
-    const jitter = Math.random() * 5; // 让时间更自然
-    const time = Number((baseTime + jitter).toFixed(2));
+const TEXT_TEMPLATES = [
+  "快看！第 {id} 波弹幕",
+  "测试弹幕 {id}",
+  "气氛拉满 {id}",
+  "彩虹弹幕 {id}",
+  "剧情推进中 {id}",
+  "音乐动起来 {id}",
+  "弹幕打卡 {id}",
+  "高能预警 {id}",
+  "欢迎围观 {id}",
+  "笑点 +{mod}",
+];
 
-    const textVariants = [
-      `测试弹幕 ${index + 1}`,
-      `这是第 ${index + 1} 条弹幕，欢迎围观`,
-      `高能预警 ${index + 1}`,
-      `快看！第 ${index + 1} 波弹幕`,
-      `笑点 +${(index % 5) + 1}`,
-      `彩虹弹幕 ${index + 1}`,
-      `弹幕打卡 ${index + 1}`,
-      `剧情推进中 ${index + 1}`,
-      `音乐动起来 ${index + 1}`,
-      `气氛拉满 ${index + 1}`,
-    ];
+function createMinuteChunk(minute: number): SeedDanmaku[] {
+  const start = minute * 60;
+  return Array.from({ length: COMMENTS_PER_MINUTE }, (_, index) => {
+    const globalId = minute * COMMENTS_PER_MINUTE + index + 1;
+    const jitter = Math.random() * 60;
+    const time = Math.min(start + jitter, VIDEO_DURATION_SECONDS - 0.1);
+    const template = TEXT_TEMPLATES[index % TEXT_TEMPLATES.length];
 
     return {
-      text: textVariants[index % textVariants.length],
-      time: Math.min(time, VIDEO_DURATION_SECONDS - 1),
+      text: template
+        .replace("{id}", String(globalId))
+        .replace("{mod}", String((globalId % 5) + 1)),
+      time: Number(time.toFixed(2)),
       mode: MODE_POOL[index % MODE_POOL.length],
       style: {
-        fontSize: `${18 + (index % 12)}px`, // 18-30px，更大的字体便于压力测试观察
+        fontSize: `${18 + (index % 12)}px`,
         color: COLOR_POOL[index % COLOR_POOL.length],
         fontWeight: index % 7 === 0 ? "bold" : undefined,
         textShadow: index % 9 === 0 ? "0 0 6px rgba(0,0,0,0.45)" : undefined,
       },
-    } satisfies SeedDanmaku;
+    };
   });
 }
 
-const DANMAKU_SEED = createDanmakuSeed();
+export function fetchDanmakuChunk(minute: number): Promise<SeedDanmaku[]> {
+  if (minute < 0 || minute >= TOTAL_MINUTES) {
+    return Promise.resolve([]);
+  }
 
-export default DANMAKU_SEED;
+  return new Promise((resolve) => {
+    const latency = 200 + Math.random() * 200;
+    setTimeout(() => {
+      resolve(createMinuteChunk(minute));
+    }, latency);
+  });
+}
