@@ -149,13 +149,12 @@ export default function VideoPlayer() {
             <div
               style={{
                 position: "absolute",
-                left: "4%",
-                right: "4%",
-                bottom: 12,
-                padding: "14px 16px",
+                insetInline: "8%",
+                bottom: 16,
+                padding: "16px 20px 18px",
                 background:
-                  "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.75) 85%)",
-                borderRadius: 20,
+                  "linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.65) 100%)",
+                borderRadius: 24,
                 boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
                 transform: controlsVisible
                   ? "translateY(0)"
@@ -165,7 +164,14 @@ export default function VideoPlayer() {
                 pointerEvents: controlsVisible ? "auto" : "none",
               }}
             >
-              <MediaTimeRange />
+              <div
+                style={{
+                  paddingInline: "8px",
+                  paddingBottom: "10px",
+                }}
+              >
+                <MediaTimeRange />
+              </div>
               <MediaControlBar>
                 <MediaPlayButton />
                 <MediaTimeDisplay showDuration />

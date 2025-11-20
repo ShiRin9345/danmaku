@@ -140,15 +140,30 @@ media-controller {
 media-time-range {
   width: 100%;
   height: 4px;
-  margin-bottom: 10px;
+  --media-control-background: transparent;
+  --media-control-hover-background: transparent;
   --media-range-track-height: 4px;
   --media-range-track-border-radius: 999px;
+  --media-range-track-margin: 0;
   --media-range-bar-color: #fff;
-  --media-range-track-color: rgba(255, 255, 255, 0.35);
+  --media-range-track-color: rgba(255, 255, 255, 0.18);
 }
 
 media-time-display {
   font-size: 13px;
+  color: #fff;
+}
+
+media-time-range::part(track),
+media-time-range::part(aux-track) {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+
+media-time-range::part(preview-box),
+media-time-range::part(preview-time) {
+  background: transparent;
+  box-shadow: none;
   color: #fff;
 }
 
