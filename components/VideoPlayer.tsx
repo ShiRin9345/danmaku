@@ -114,7 +114,7 @@ export default function VideoPlayer() {
       <div className="w-full max-w-5xl space-y-4">
         <div
           ref={containerRef}
-          className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-black"
+          className="relative w-full overflow-hidden rounded-[28px] bg-black shadow-[0_24px_60px_rgba(15,23,42,0.45)]"
           style={{
             aspectRatio: "16 / 9",
             minHeight: "360px",
@@ -152,18 +152,20 @@ export default function VideoPlayer() {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                padding: "12px 16px",
+                padding: "18px 24px 24px",
                 background:
-                  "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)",
+                  "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.75) 70%)",
                 transform: controlsVisible
                   ? "translateY(0)"
-                  : "translateY(100%)",
+                  : "translateY(60px)",
                 opacity: controlsVisible ? 1 : 0,
-                transition: "transform 0.25s ease, opacity 0.25s ease",
+                transition: "transform 0.3s ease, opacity 0.3s ease",
                 pointerEvents: controlsVisible ? "auto" : "none",
+                borderBottomLeftRadius: "28px",
+                borderBottomRightRadius: "28px",
               }}
             >
-              <MediaTimeRange style={{ width: "100%", marginBottom: "8px" }} />
+              <MediaTimeRange />
               <MediaControlBar>
                 <MediaPlayButton />
                 <MediaTimeDisplay showDuration />

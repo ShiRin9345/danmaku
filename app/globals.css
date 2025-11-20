@@ -120,3 +120,28 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Media Chrome tweaks */
+media-control-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 8px;
+  background: none;
+  color: #fff;
+}
+
+media-time-range {
+  width: 100%;
+  height: 4px;
+  margin-bottom: 10px;
+  --media-range-track-height: 4px;
+  --media-range-track-border-radius: 999px;
+  --media-range-bar-color: #fff;
+  --media-range-track-color: rgba(255, 255, 255, 0.35);
+}
+
+media-time-display {
+  font-size: 13px;
+  color: #fff;
+}
