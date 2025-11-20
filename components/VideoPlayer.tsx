@@ -25,6 +25,7 @@ export default function VideoPlayer() {
   const socketRef = useRef<Socket | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [isConnected, setIsConnected] = useState(false);
+  const [controlsVisible, setControlsVisible] = useState(true);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -120,6 +121,10 @@ export default function VideoPlayer() {
             lineHeight: "1.2",
             fontSize: "18px",
           }}
+          onMouseEnter={() => setControlsVisible(true)}
+          onMouseMove={() => setControlsVisible(true)}
+          onMouseLeave={() => setControlsVisible(false)}
+          onTouchStart={() => setControlsVisible(true)}
         >
           <MediaController
             suppressHydrationWarning
@@ -141,15 +146,34 @@ export default function VideoPlayer() {
             >
               您的浏览器不支持 HTML5 视频。
             </video>
-            <MediaControlBar>
-              <MediaPlayButton />
-              <MediaTimeRange />
-              <MediaTimeDisplay showDuration />
-              <MediaMuteButton />
-              <MediaVolumeRange />
-              <MediaPlaybackRateButton />
-              <MediaFullscreenButton />
-            </MediaControlBar>
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                bottom: 0,
+                padding: "12px 16px",
+                background:
+                  "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)",
+                transform: controlsVisible
+                  ? "translateY(0)"
+                  : "translateY(100%)",
+                opacity: controlsVisible ? 1 : 0,
+                transition: "transform 0.25s ease, opacity 0.25s ease",
+                pointerEvents: controlsVisible ? "auto" : "none",
+              }}
+            >
+              <MediaTimeRange style={{ width: "100%", marginBottom: "8px" }} />
+              <MediaControlBar>
+                <MediaPlayButton />
+                <MediaTimeDisplay showDuration />
+                <div style={{ flex: 1 }} />
+                <MediaMuteButton />
+                <MediaVolumeRange />
+                <MediaPlaybackRateButton />
+                <MediaFullscreenButton />
+              </MediaControlBar>
+            </div>
           </MediaController>
         </div>
 
