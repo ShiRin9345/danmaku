@@ -44,7 +44,7 @@ export default function VideoPlayer() {
     const container = containerRef.current;
     if (!video || !container) return;
 
-    const socket = io({ path: "/socket.io/" });
+    const socket = io({ path: "/api/socket" });
     socketRef.current = socket;
 
     const initializeDanmaku = () => {
